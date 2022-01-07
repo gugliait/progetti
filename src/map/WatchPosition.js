@@ -29,12 +29,6 @@ export default WatchPosition = (props) => {
         console.log("start");
         let mounted = true;
         (async () => {
-            if (Platform.OS === 'android' && !Constants.isDevice) {
-                setErrorMsg(
-                    'Oops, this will not work on Snack in an Android emulator. Try it on your device!'
-                );
-                return;
-            }
     
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {

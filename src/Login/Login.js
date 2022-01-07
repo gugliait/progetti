@@ -1,9 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Constants from 'expo-constants';
-import * as Location from 'expo-location';
 import { Animated, SafeAreaView,StyleSheet, Text, View, Dimensions, Alert, TouchableOpacity, Modal, Image,TextInput, Button, Platform, PointPropType } from 'react-native';
-import MapView from 'react-native-maps';
-import { Fragment } from 'react';
 import { Camera } from "expo-camera";
 import PlaceModule from "../../src/PlaceModule"
 import CameraModule from "../../src/common/CameraModule"
@@ -12,8 +8,9 @@ import WatchPosition from "../map/WatchPosition"
 import SubMenu from "../Login/SubMenu"
 import Mappa from '../map/Mappa';
 import Icona from '../common/Icona'
-import axios from 'axios';
+// import axios from 'axios';
 import { DbManager } from '../database/DbManager';
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 const api = 'http://192.168.178.103:1337/gruppi';
 
@@ -49,14 +46,35 @@ export default Login = ({navigation, route}) => {
     const [markers, setMarkers] = useState([]);
     const [zoom, setZoom] = useState(12);
 
+    const [mapDimensions, setMapDimensions] = useState(
+        {
+            width: Dimensions.get('window').width,
+            height: Dimensions.get('window').height,
+        }
+    );
+
     useEffect(() => {
         (async () => {
-           const { status } = await Camera.requestPermissionsAsync();
+           const { status } = await Camera.requestCameraPermissionsAsync();
            setHasPermission(status === "granted");
         })();                          
         setDidMount(true);
         return () => setDidMount(false);
     }, []);
+
+    useEffect(() => {
+        const subscription = ScreenOrientation.addOrientationChangeListener((e) => {
+            console.log('e ', e);
+            setMapDimensions({
+                width: Dimensions.get('window').width,
+                height: Dimensions.get('window').height,
+              }            
+            )
+        });                   
+        return ()=>{
+            ScreenOrientation.removeOrientationChangeListener(subscription);
+        }
+    },[]);
 
     useEffect(() => {
         console.log('Modalità: ' + mode);
@@ -97,7 +115,7 @@ export default Login = ({navigation, route}) => {
     useEffect(() => {        
         setDidMount(true);
         return () => setDidMount(false);   
-    }, []);
+    }, []); 
 
 
     // axios.get(api).then(response => {
@@ -281,10 +299,10 @@ export default Login = ({navigation, route}) => {
                 IconSize={iconSize}
                 OnPress={(lt, ln) => onMarkerPressHandler(lt, ln)}
                 Mode={mode}
-                SetZoom={(z) => setZoom(z)}
-                
-
+                SetZoom={(z) => setZoom(z)}                
                 ZoomRegion={region}
+                MapDimensions = {mapDimensions}
+
                 />
             <WatchPosition action={watchPosition} fun={(l) => updateLocation(l)} err={() => errUpdateLocation()} />
             <View style={styles.menuContainer}>
@@ -358,15 +376,9 @@ export default Login = ({navigation, route}) => {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      borderWidth: 1,
-      borderColor: 'red',
       backgroundColor: '#fff',
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    map: {
-      width: Dimensions.get('window').width,
-      height: Dimensions.get('window').height,
     },
 
     menuContainer: {
