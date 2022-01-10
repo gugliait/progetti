@@ -15,11 +15,11 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 const api = 'http://192.168.178.103:1337/gruppi';
 
 export default Login = ({navigation, route}) => {    
-    const [image, setImage] = useState(null);
-    const [camera, setShowCamera] = useState(false);
+    const [imageSelected, setImageSelected] = useState(null);
+    const [cameraVisible, setCameraVisible] = useState(false);
     const [hasPermission, setHasPermission] = useState(null);     
-    const [place, setShowPlace] = useState(false);
-    const [viewImage, setShowViewImageModule] = useState(false);
+    const [placeVisible, setPlaceVisible] = useState(false);
+    const [preViewImageVisible, setPreviewImageVisible] = useState(false);
     const [didMount, setDidMount] = useState(false); 
     const [coordsText, setCoordsText] = useState("");
 
@@ -52,6 +52,38 @@ export default Login = ({navigation, route}) => {
             height: Dimensions.get('window').height,
         }
     );
+
+    const [buttonBackVisible, setButtonBackVisible] = useState(true);
+    const [images, setImages] = useState({setImg: '',
+                                            images: {
+                                                img1:{
+                                                    src:null
+                                                },
+                                                img2:{
+                                                    src:null,
+                                                },
+                                                img3:{
+                                                    src:null,
+                                                }
+                                            }
+                                        });
+    /*
+        {
+            setImg: 'Img1' oppure Img2 oppure Img3
+            images: {
+                img1:{
+                    src='',
+                },
+                img2:{
+                    src='',
+                },
+                img3:{
+                    src='',
+                }
+            }
+        }
+    */
+
 
     useEffect(() => {
         (async () => {
@@ -280,7 +312,9 @@ export default Login = ({navigation, route}) => {
                 alert("Indicare un punto sulla mappa.");
             } else {
                 setWatchPosition('stop'); 
-                setShowCamera(true);  
+                images.setImg = 'Img1';
+                setImages(images);
+                setCameraVisible(true);  
             }                       
         } else {
             alert("Per eseguire questa operazione bisogna essere in modalità manuale o location!");
@@ -333,39 +367,58 @@ export default Login = ({navigation, route}) => {
                     </TouchableOpacity>                        
                 </View>
             </View>  
-            {camera && (
+            {cameraVisible && (
                         <CameraModule
-                        showModal={camera}
-                        setModalVisible={() => {setShowCamera(false); if (mode==1) setWatchPosition('start');}}
-                        setImage={(result) => setImage(result.uri)}
-                        setViewImageModuleVisible={() => { setShowPlace(true)}}
-                        onShow={(e) => {setWatchPosition('stop')}}
+                        // showModal={cameraVisible}
+                        SetCameraVisible={(value) => { setCameraVisible(value);}}
+                        SetImageSelected={(result) => setImageSelected(result)}
+                        SetPreviewImageVisible={(value) => { setPlaceVisible(value)}}
+                        Mode={mode}
+                        WatchPositionStart={() => setWatchPosition('start')}
+                        WatchPositionStop={() => setWatchPosition('stop')}
+                        Images={images}
+                        SetImages={(imgs) => setImages(imgs)}
                         />
                     )}   
-            {place && (
+            {placeVisible && (
                         <ViewImageModule
-                        showModal={place}
-                        setImage={() => image}     
-                        SetShowCamera={() => {setShowCamera(true); setWatchPosition('stop');}}                   
-                        setViewImageModuleVisible={() => {setShowPlace(false                                                                                            ); if (mode==1) setWatchPosition('start');}}
-                        setPlaceModuleVisible={() => {setShowViewImageModule(true)}}
-                        onShow={(e) => {setWatchPosition('stop')}}
+                        // showModal={placeVisible}
+                        ImageSelected={imageSelected}
+                        Images={images}
+                        SetImages={(imgs) => setImages(imgs)}
+                        SetImageSelected={(result) => setImageSelected(result)}
+                        Mode={mode} 
+                        ButtonBackVisible={buttonBackVisible}
+                        SetButtonBackVisible={(value) => setButtonBackVisible(value)} 
+                        SetCameraVisible={(value) => {setCameraVisible(value); setWatchPosition('stop');}}                   
+                        SetPreviewImageVisible={(value) => {setPlaceVisible(value);}}
+                        SetPlaceVisible={(value) => {setPreviewImageVisible(value)}}
+                        WatchPositionStart={() => setWatchPosition('start')}
+                        WatchPositionStop={() => setWatchPosition('stop')}   
                         />
                     )}       
-            {viewImage && (
+            {preViewImageVisible && (
                 <PlaceModule
                     CoordsSelected={coordsSelected}
                     navigation={navigation}
-                    showModal={viewImage}
-                    setImage={() => image}
+                    // showModal={preViewImageVisible}
+                    SetImage={() => imageSelected}
                     onShow={(e) => {setWatchPosition('stop')}}
                     Route={route}
-                    SetMode={(m) => setMode(m)}
                     Navigation={navigation}
-                    setPlaceModuleVisible={() => {                        
-                        setShowViewImageModule(false);
-                        if (mode==1) setWatchPosition('start');
-                    }} />
+                    SetPreviewImageVisible={(value) => {setPlaceVisible(value)}}
+                    SetCameraVisible={() => {setCameraVisible(true); setWatchPosition('stop');}}  
+                    SetPlaceVisible={(value) => {                        
+                        setPreviewImageVisible(value);
+                        //if (mode==1) setWatchPosition('start');
+                    }} 
+                    WatchPositionStart={() => setWatchPosition('start')}
+                    WatchPositionStop={() => setWatchPosition('stop')}
+                    SetButtonBackVisible={(value) => setButtonBackVisible(value)}   
+                    Images={images}
+                    SetImages={(imgs) => setImages(imgs)}
+                    SetImageSelected={(result) => setImageSelected(result)}
+                    />
             )}              
                 <View style={styles.bottomView}>
                     <Text style={styles.textStyle}>{coordsText}</Text>

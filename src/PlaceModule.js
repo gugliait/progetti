@@ -21,23 +21,11 @@ import {ModalSelectorCustom} from '../src/common/ModalSelectorCustom'
 import {DbManager} from './database/DbManager'
 import {Helper} from '../src/common/Helper'
 
-
-
-
 const PlaceModule = (props) => {
-  const [image, setImage] = useState(props.setImage());
-  
-  const [image2, setImage2] = useState(null);
-  const [image3, setImage3] = useState(null);
-  const [camera, setShowCamera] = useState(false);
-  const [hasPermission, setHasPermission] = useState(null);
-  const [viewImage, setShowViewImageModule] = useState(false);
-  const [place, setShowPlace] = useState(false);
-  const [img, setImg] = useState('img1');
+  const [hasPermission, setHasPermission] = useState(null);  
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [date, setDate] = useState(new Date());
   const [optionSelected, setOptionSelected] = useState(null);
-
   const [valueDescription, setValueDescription] = useState('')
   const [valuePlace, setValuePlace] = useState('');
   const [coordsSelected, setCoordsSelected] = useState(props.CoordsSelected);
@@ -60,15 +48,6 @@ const PlaceModule = (props) => {
     return date !== ''
       ? `${tempDate[0]} ${tempDate[1]} ${tempDate[2]} ${tempDate[3]}`
       : '';
-  };
-
-  const deleteImage = (numPhoto) => {
-    if (numPhoto == 1) setImage(null);
-    else if (numPhoto == 2) {
-      setImage2(null);
-    } else if (numPhoto == 3) {
-      setImage3(null);
-    }
   };
 
   const defaultPoint = {
@@ -208,6 +187,7 @@ L'inserimento avviene con questo ordine:
   }
 
   /*Validazione Images */
+  /*
   function validateInputImage() {
     let result = true
     if(Helper.isEmpty(image)) {
@@ -215,7 +195,8 @@ L'inserimento avviene con questo ordine:
       result = false;
     } 
     return result;    
-  }  
+  }
+  */  
 
   function validateInputImageId(imgId) {
     let result = true;
@@ -254,7 +235,7 @@ L'inserimento avviene con questo ordine:
 
     if (!validateInputCircumstancesId(crcId)) { return false; }
     if (!validatePlace()) { return false; }
-    if (!validateInputImage()) {return false; } else {fileName = image.substr(image.lastIndexOf("/")+1);} 
+    fileName = ""; //image.substr(image.lastIndexOf("/")+1);} 
 
     insertCircumstancesAsync(crcId, optionSelected.label, '2021-09-14', (resCrcId) => {
       crcId = resCrcId; 
@@ -275,9 +256,7 @@ L'inserimento avviene con questo ordine:
         }
       //TODO SISTEMARE LA GESTIONE DELL'UTENTE DOPO IL LOGIN
         insertPlacesAsync('1', crcId, plcId, (resPlsId)=>{
-          props.SetMode(1);
-          props.setPlaceModuleVisible();
-          
+          props.SetPlaceVisible(false);          
           props.Navigation.navigate('places'); 
         })          
       });      
@@ -290,10 +269,10 @@ L'inserimento avviene con questo ordine:
       animationType="slide"
       transparent={false}
       visible={true}
-      onShow={(e) => {props.onShow(e)}}
+      onShow={(e) => {props.WatchPositionStop();}}
       onRequestClose={() => {
         console.log('placemodule = onRequestClose');
-        props.setPlaceModuleVisible();
+        props.SetPlaceVisible(false);
       }}>
       <View
         style={{
@@ -362,8 +341,9 @@ L'inserimento avviene con questo ordine:
                   }}>
                   <TouchableOpacity
                     onPress={() => {
-                      setImg('img1');
-                      setShowPlace(true);
+                      props.SetImageSelected(props.Images.images.img1.src);
+                      props.SetButtonBackVisible(false);
+                      props.SetPreviewImageVisible(true);
                     }}
                     style={{ flex: 1, marginLeft: 10 }}>
                     <Ionicons
@@ -397,8 +377,9 @@ L'inserimento avviene con questo ordine:
                   }}>
                   <TouchableOpacity
                     onPress={() => {
-                      setImg('img1');
-                      setShowCamera(true);
+                      props.Images.setImg = 'Img1';
+                      props.SetImages(props.Images);
+                      props.SetCameraVisible(true);
                     }}>
                     <Ionicons
                       name="md-camera"
@@ -419,7 +400,12 @@ L'inserimento avviene con questo ordine:
                     justifyContent: 'flex-end',
                     alignItems: 'baseline',
                   }}>
-                  <TouchableOpacity onPress={() => deleteImage(1)}>
+                  <TouchableOpacity onPress={() => {
+                    const updatedObjectImg1 = Object.assign({}, props.Images)
+                    updatedObjectImg1.setImg = 'Img1';
+                    updatedObjectImg1.images.img1.src = null;
+                    props.SetImages(updatedObjectImg1);   
+                  }}>
                     <Ionicons
                       name="md-trash"
                       size={20}
@@ -429,7 +415,7 @@ L'inserimento avviene con questo ordine:
                 </View>
                 <View>
                   <Image
-                    source={{ uri: image }}
+                    source={{ uri: props.Images.images.img1.src }}
                     style={{
                       borderRadius: 5,
                       height: 120,
@@ -453,8 +439,9 @@ L'inserimento avviene con questo ordine:
                   }}>
                   <TouchableOpacity
                     onPress={() => {
-                      setImg('img2');
-                      setShowPlace(true);
+                      props.SetImageSelected(props.Images.images.img2.src);
+                      props.SetButtonBackVisible(false);
+                      props.SetPreviewImageVisible(true);
                     }}
                     style={{ flex: 1, marginLeft: 10 }}>
                     <Ionicons
@@ -489,8 +476,9 @@ L'inserimento avviene con questo ordine:
                   <TouchableOpacity
                     style={{}}
                     onPress={() => {
-                      setImg('img2');
-                      setShowCamera(true);
+                      props.Images.setImg = 'Img2';
+                      props.SetImages(props.Images);
+                      props.SetCameraVisible(true);
                     }}>
                     <Ionicons
                       name="md-camera"
@@ -511,7 +499,12 @@ L'inserimento avviene con questo ordine:
                     justifyContent: 'flex-end',
                     alignItems: 'baseline',
                   }}>
-                  <TouchableOpacity style={{}} onPress={() => deleteImage(2)}>
+                  <TouchableOpacity style={{}} onPress={() => {
+                    const updatedObjectImg2 = Object.assign({}, props.Images)
+                    updatedObjectImg2.setImg = 'Img2';
+                    updatedObjectImg2.images.img2.src = null;
+                    props.SetImages(updatedObjectImg2);   
+                  }}>
                     <Ionicons
                       name="md-trash"
                       size={20}
@@ -521,7 +514,7 @@ L'inserimento avviene con questo ordine:
                 </View>
                 <View>
                   <Image
-                    source={{ uri: image2 }}
+                    source={{ uri: props.Images.images.img2.src }}
                     style={{
                       borderRadius: 5,
                       height: 120,
@@ -545,8 +538,9 @@ L'inserimento avviene con questo ordine:
                   }}>
                   <TouchableOpacity
                     onPress={() => {
-                      setImg('img3');
-                      setShowPlace(true);
+                      props.SetImageSelected(props.Images.images.img3.src);
+                      props.SetButtonBackVisible(false);
+                      props.SetPreviewImageVisible(true);
                     }}
                     style={{ flex: 1, marginLeft: 10 }}>
                     <Ionicons
@@ -581,8 +575,9 @@ L'inserimento avviene con questo ordine:
                   <TouchableOpacity
                     style={{}}
                     onPress={() => {
-                      setImg('img3');
-                      setShowCamera(true);
+                      props.Images.setImg = 'Img3';
+                      props.SetImages(props.Images);
+                      props.SetCameraVisible(true);
                     }}>
                     <Ionicons
                       name="md-camera"
@@ -603,7 +598,12 @@ L'inserimento avviene con questo ordine:
                     justifyContent: 'flex-end',
                     alignItems: 'baseline',
                   }}>
-                  <TouchableOpacity style={{}} onPress={() => deleteImage(3)}>
+                  <TouchableOpacity style={{}} onPress={() => {
+                    const updatedObjectImg3 = Object.assign({}, props.Images)
+                    updatedObjectImg3.setImg = 'Img3';
+                    updatedObjectImg3.images.img3.src = null;
+                    props.SetImages(updatedObjectImg3);                    
+                  }}>
                     <Ionicons
                       name="md-trash"
                       size={20}
@@ -613,7 +613,7 @@ L'inserimento avviene con questo ordine:
                 </View>
                 <View>
                   <Image
-                    source={{ uri: image3 }}
+                    source={{ uri: props.Images.images.img3.src }}
                     style={{
                       borderRadius: 5,
                       height: 120,
@@ -856,12 +856,12 @@ L'inserimento avviene con questo ordine:
         </ScrollView>
       </View>
 
-      {camera && (
+      {/*camera && (
         <CameraModule
           img={img}
           showModal={camera}
-          setModalVisible={() => setShowCamera(false)}             
-          setImage={(result, img) => {
+          SetModalVisible={(value) => setShowCamera(value)}             
+          SetImage={(result, img) => {
             if (img) {
               if (img == 'img1') {
                 console.log('setImage ', img);
@@ -881,7 +881,7 @@ L'inserimento avviene con questo ordine:
           setViewImageModuleVisible={() => setShowPlace(true)}
         />
       )}
-      {place && (
+      { {place && (
         <ViewImageModule
           showModal={place}
           SetShowCamera={() => setShowCamera(true)}  
@@ -905,7 +905,7 @@ L'inserimento avviene con questo ordine:
           setViewImageModuleVisible={() => setShowPlace(false)}
           setPlaceModuleVisible={() => {}}
         />
-      )}
+      )} */}
     </Modal>
   );
 };

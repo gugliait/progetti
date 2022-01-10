@@ -15,9 +15,12 @@ const CameraModule = (props) => {
        zoom={1}
        visible={true}
        onRequestClose={() => {
-         props.setModalVisible();         
+        if (props.Mode==1) {
+          props.WatchPositionStart();
+        }          
+        props.SetCameraVisible(false);         
        }}
-       onShow={(e) => {props.onShow(e)}}
+       onShow={(e) => {props.WatchPositionStop()}}
      >
        <Camera
          style={{ flex: 1 }}
@@ -45,7 +48,7 @@ const CameraModule = (props) => {
            >
              <TouchableOpacity
                onPress={() => {
-               props.setModalVisible();
+               props.SetCameraVisible(false);
                }}>
                    
                <Text style={{color:'white', marginLeft:8}}><Ionicons name="md-close" size={16} color="white" /> Close</Text>       
@@ -55,10 +58,9 @@ const CameraModule = (props) => {
                  if (cameraRef) {
                    const options = {quality: 1, base64: true, skipProcessing: true};
                    let photo = await cameraRef.takePictureAsync(options);
-                   props.setImage(photo, props.img);
-                   props.setViewImageModuleVisible();
-                   props.setModalVisible();
-               
+                   props.SetImageSelected(photo.uri);
+                   props.SetPreviewImageVisible(true);
+                   props.SetCameraVisible(false);               
                  }
                }}
              >

@@ -45,8 +45,8 @@ export default SubMenu = (props) => {
         setIconFlagVisible(false);
         setIconManualVisible(true);
         setIconLocationVisible(true);
-        setIconType("Ionicons");
-        setIconName("flag");
+        setIconType("FontAwesome");
+        setIconName("pinterest-p");
         setIconColor("#2DC653");
         setIconSize(28);
         props.SetMode(2);

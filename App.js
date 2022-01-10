@@ -1,22 +1,13 @@
 import React, { useState, useEffect, useRef} from 'react';
 import './global.js';
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, PermissionsAndroid, TouchableHighlight} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './src/Login/Login';
 import places from './src/places/places';
-import * as FileSystem from 'expo-file-system';
-import * as SQLite from 'expo-sqlite'
-import { Asset } from 'expo-asset';
+
 import {DbManager} from './src/database/DbManager';
 
-import Dropdown from 'react-native-modal-select-option';
-import {ModalSelectorCustom} from './src/common/ModalSelectorCustom'
-
-import { Ionicons } from '@expo/vector-icons';
-
-import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const Stack = createNativeStackNavigator();
 

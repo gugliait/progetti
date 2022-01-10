@@ -8,30 +8,54 @@ const ViewImageModule = (props) => {
         animationType="slide"
         transparent={false}
         visible={true}
-        onShow={(e) => {props.onShow(e)}}
+        onShow={(e) => {props.WatchPositionStop()}}
         onRequestClose={() => {
-            props.setViewImageModuleVisible();       
+            if (props.Mode==1) {
+                props.WatchPositionStart();
+              }               
+            props.SetPreviewImageVisible(false);       
         }}>
             <Image
                 style={{width: '100%', height: '100%'}}
-                source={{ uri: props.setImage() }}
+                source={{ uri: props.ImageSelected }}
             /> 
             <View style={{ width:'100%', flex:1,  position:'absolute', bottom:20, flexDirection:'row', alignItems:'center'}}>
                 <View style={{flex: 1, backgroundColor: "transparent", justifyContent: "flex-end",}}>
-                    <View style={{  backgroundColor: "transparent", flexDirection: "row", alignItems: "center",  justifyContent: "space-between",}} >
-                        <TouchableOpacity onPress={() => {props.setViewImageModuleVisible(); props.SetShowCamera()}} style={{flexDirection: "row"}}>
-                            <Ionicons name="md-arrow-back" size={28} color="white" style={{ marginLeft:18, }} /> 
-                            <Text style={{color:'white', marginLeft:4, fontSize:20, padding:0, margin:0, fontWeight:'bold'}}>                                
-                                Back
-                            </Text>       
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={()=>{
-                                            props.setViewImageModuleVisible();  
-                                            props.setPlaceModuleVisible();
-                                            }} style={{flexDirection: "row", marginRight:18}}>
-                            <Ionicons name="md-checkmark" size={28} color="white" style={{fontWeight:'bold'}}/>
-                            <Text style={{color:'white', marginRight:2, fontSize:20, padding:0, margin:0, fontWeight:'bold'}}>  OK </Text>
-                        </TouchableOpacity>
+                    <View style={{backgroundColor: "transparent", flexDirection: "row", alignItems: "center",  justifyContent: "space-between",}} >
+                        <View style={{width:'50%'}}>
+                            {props.ButtonBackVisible && <TouchableOpacity  onPress={
+                                () => {
+                                    props.SetPreviewImageVisible(false); 
+                                    props.SetCameraVisible(true);
+                                    }
+                                } style={{flexDirection: "row"}}>
+                                <Ionicons name="md-arrow-back" size={28} color="white" style={{ marginLeft:18, }} /> 
+                                <Text style={{color:'white', marginLeft:4, fontSize:20, padding:0, margin:0, fontWeight:'bold'}}>                                
+                                    Back
+                                </Text>       
+                            </TouchableOpacity>}
+                        </View>
+                        <View style={{width:'50%', alignItems: 'flex-end'}}>
+                            <TouchableOpacity onPress={
+                                                    ()=>{
+                                                        if (props.Images.setImg == 'Img1') {
+                                                            props.Images.images.img1.src = props.ImageSelected
+                                                        } else if (props.Images.setImg == 'Img2') {
+                                                            props.Images.images.img2.src = props.ImageSelected
+                                                        } else if (props.Images.setImg == 'Img3') {
+                                                            props.Images.images.img3.src = props.ImageSelected
+                                                        }
+                                                        props.SetImages(props.Images);
+                                                        props.SetPreviewImageVisible(false);  
+                                                        props.SetPlaceVisible(true);
+                                                        }
+                                                    } style={{flexDirection: "row", marginRight:18}}>
+                                <Ionicons name="md-checkmark" size={28} color="white" style={{fontWeight:'bold'}}/>
+                                <Text style={{color:'white', marginRight:2, fontSize:20, padding:0, margin:0, fontWeight:'bold'}}>  OK </Text>
+                            </TouchableOpacity>
+                        </View>                        
+
+
                         {/* <TouchableOpacity icon="axis-z-rotate-clockwise" style={{ marginRight: 12 }} mode="outlined" color="white">
                             <Text style={{color:'white', marginRight:8}}> <Ionicons name="md-swap-horizontal" size={16} color="white" /> Ciao</Text>
                         </TouchableOpacity> */}
